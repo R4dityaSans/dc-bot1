@@ -4,8 +4,11 @@
 import discord
 import random
 from discord.ext import commands
+from bot_logic import gen_pass
 import os
 import requests
+
+
 
 description = '''An example bot to showcase the discord.ext.commands extension
 module.
@@ -56,7 +59,7 @@ async def exp(ctx, left: int, right: int):
 async def meme(ctx):
     # try by your self 2 min
     # img_name = random.choice(os.listdir('images'))
-    with open(f'images/meme1.jpg', 'rb') as f:
+    with open(f'meme/papyrus.jpg', 'rb') as f:
         picture = discord.File(f)
  
     await ctx.send(file=picture)
@@ -111,7 +114,10 @@ async def repeat(ctx, times: int, content='repeating...'):
     for i in range(times):
         await ctx.send(content)
         
-
+# password generator        
+@bot.command()
+async def pw(ctx):
+    await ctx.send(f'Kata sandi yang dihasilkan: {gen_pass(10)}')
 @bot.command()
 async def bye(ctx):
     await ctx.send('\U0001f642')
@@ -146,6 +152,57 @@ async def dice(ctx):
 async def joined(ctx, member: discord.Member):
     """Says when a member joined."""
     await ctx.send(f'{member.name} joined {discord.utils.format_dt(member.joined_at)}') # type: ignore
+
+@bot.command(name='trash', help='Tells you what type of trash something is')
+async def trash(ctx, *, item: str):
+    item = item.lower()
+    
+    trash_types = {
+        'plastic ': [
+            'bottle', 'bag', 'straw', 'wrapper', 'plastic cup', 'plastic fork',
+            'yogurt container', 'plastic lid', 'plastic spoon', 'cling film',
+            'plastic packaging', 'bubble wrap'
+        ],
+        'metal': [
+            'tin can', 'aluminum foil', 'soda can', 'metal fork', 'metal spoon',
+            'steel can', 'aerosol can', 'canned food can', 'nail', 'screw'
+        ],
+        'glass': [
+            'glass bottle', 'jar', 'broken glass', 'wine bottle', 'beer bottle',
+            'glass cup', 'mirror (small)', 'perfume bottle'
+        ],
+        'paper': [
+            'newspaper', 'magazine', 'cardboard', 'paper', 'tissue box',
+            'envelope', 'paper bag', 'receipt', 'toilet paper roll',
+            'notebook paper', 'paper cup (if not plastic-lined)'
+        ],
+        'organic': [
+            'banana peel', 'apple core', 'food waste', 'leftovers', 'vegetable scraps',
+            'egg shell', 'coffee grounds', 'tea bag (non-plastic)', 'bread crust',
+            'orange peel', 'rice', 'pasta', 'bones', 'corn cob'
+        ],
+        'e-waste': [
+            'battery', 'phone', 'charger', 'laptop', 'mouse', 'keyboard',
+            'headphones', 'USB stick', 'power bank', 'remote', 'light bulb (LED)',
+            'printer cartridge'
+        ],
+        'hazardous': [
+            'paint', 'medicine', 'chemical', 'bleach bottle', 'pesticide',
+            'nail polish', 'lighter', 'thermometer (mercury)', 'motor oil',
+            'fluorescent bulb', 'glue'
+        ]
+    }
+
+    found = False
+    for category, items in trash_types.items():
+        if item in items:
+            await ctx.send(f"🗑️ '{item}' is **{category}** trash.")
+            found = True
+            break
+
+    if not found:
+        await ctx.send(f"❓ Sorry Bro, I don't know what kind of trash '{item}' is. 🤷‍♂️")
+
 
 #show local drive    
 @bot.command()
